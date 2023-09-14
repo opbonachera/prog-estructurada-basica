@@ -39,11 +39,12 @@ int CargarAlumnos(char Nombres[][100], int Dni[]){
     int i=0, cant=0;
 
     printf("Ingrese el nombre del alumno...\n");
-    fgets(Nombre,100,stdin);
     fflush(stdin);
+    fgets(Nombre,100,stdin);
+
 
     while(strcmpi(Nombre,"FIN")!=0 && i<50){
-        fflush(stdin);
+
         printf("Ingrese el DNI del alumno...\n");
         scanf("%d",&Dni[i]);
 
@@ -51,12 +52,11 @@ int CargarAlumnos(char Nombres[][100], int Dni[]){
 
         strcpy(Nombres[i], Nombre);
         i++;
+        cant++;
 
         printf("Ingrese el nombre del alumno...\n");
-        fgets(Nombre,100,stdin);
-
-
-        cant++;
+        fflush(stdin);
+        gets(Nombre);
     }
 
     return cant;
