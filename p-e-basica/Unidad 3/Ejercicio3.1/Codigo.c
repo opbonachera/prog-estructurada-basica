@@ -59,6 +59,7 @@ int CargarAlumnos(struct ALUMNO A[], int CantMax){
     Dni = ValidarEntero(1,10,0);
 
     while(!(Dni==0)){
+        a.Dni=Dni;
         printf("Ingrese el nombre y apellido del alumno...\n");
         ValidarCadena(a.NombreApellido,3);
 
@@ -119,6 +120,7 @@ float ValidarReal(float Li,float Ls,float Cf){
     }while(!((Real>=Li && Real<=Ls)||(Real==Cf)));
     return Real;
 }
+
 
 void ValidarCadena(char Cadena[], int Largo){
     char CadenaTemp[100];
