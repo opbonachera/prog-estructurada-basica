@@ -46,6 +46,7 @@ void GrabarArchivo(struct PRODUCTO P[], int CantProd){
     printf("---ARCHIVO GRABADO CORRECTAMENTE---\n");
 }
 
+
 void ActualizarDatos(struct PRODUCTO P[], int CantProd){
     int Codigo, i=0, Pos;
     float Precio;
