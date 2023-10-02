@@ -20,7 +20,7 @@ int main(){
     struct PRODUCTO P[50];
     int CantProductos;
 
-    CantProductos = LeerArchivo();
+    CantProductos = LeerArchivo(P);
     ActualizarDatos(P,CantProductos);
     GrabarArchivo(P,CantProductos);
 
@@ -45,7 +45,7 @@ void GrabarArchivo(struct PRODUCTO P[], int CantProd){
 }
 
 void ActualizarDatos(struct PRODUCTO P[], int CantProd){
-    int Codigo, i=0;
+    int Codigo, i=0, Pos;
     float Precio;
 
     printf("---ACTUALIZACION DE PRODUCTOS---\n");
@@ -87,8 +87,9 @@ int LeerArchivo(struct PRODUCTO P[]){
     int i=0;
     FILE *archivo;
 
-    archivo = fread("PRODUCTOS.dat","wb");
+    archivo = fopen("PRODUCTOS.dat","wb");
 
+    printf("---LEYENDO ARCHIVO---\n");
     if(archivo==NULL){
         printf("Error al leer el archivo. \n");
     }else{
