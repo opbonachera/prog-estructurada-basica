@@ -33,6 +33,7 @@ void GrabarArchivo(struct PRODUCTO P[], int CantProd){
 
     archivo = fopen("productosactualizados.dat","wb");
 
+    printf("---GRABANDO ARCHIVO---\n");
     if(archivo==NULL){
         printf("Error al abrir el archivo. \n");
     }else{
@@ -42,6 +43,7 @@ void GrabarArchivo(struct PRODUCTO P[], int CantProd){
     }
 
     fclose(archivo);
+    printf("---ARCHIVO GRABADO CORRECTAMENTE---\n");
 }
 
 void ActualizarDatos(struct PRODUCTO P[], int CantProd){
@@ -50,44 +52,48 @@ void ActualizarDatos(struct PRODUCTO P[], int CantProd){
 
     printf("---ACTUALIZACION DE PRODUCTOS---\n");
     printf("Ingrese el codigo del producto que desea actualizar...\n");
-    Codigo=ValidarEntero(1,50,0);
+    Codigo=ValidarEntero(1,100000,0);
 
     while(Codigo!=0){
-        printf("Ingrese el nuevo precio del producto...\n");
-        Precio=ValidarReal(1.,10000000000.,1.);
 
         Pos = Busqueda(P,Codigo,CantProd);
 
         if(Pos!=-1){
+            printf("Ingrese el nuevo precio del producto...\n");
+            Precio=ValidarReal(1.,10000000000.,1.);
+
             P[Pos].Precio=Precio;
+            i++;
         }else{
             printf("Articulo no encontrado. \n");
         }
 
         printf("Ingrese el codigo del producto o 0 para terminar...\n");
-        Codigo=ValidarEntero(1,50,0);
+        Codigo=ValidarEntero(1,100000,0);
     }
 
     printf("---FIN DE ACTUALIZACION DE PRODUCTOS---\n");
-    printf("Se actualizaron %d productos. \n");
+    printf("Se actualizaron %d productos. \n",i);
 }
 
 int Busqueda(struct PRODUCTO P[], int Buscado, int Cant){
     int pos=-1, i=0;
 
-    while(i!=-1 && i<Cant){
+    while(pos==-1 && i<Cant){
         if(P[i].Codigo==Buscado){
-            pos=1;
+            pos=i;
+        }else{
+            i++;
         }
     }
     return pos;
 }
 
 int LeerArchivo(struct PRODUCTO P[]){
-    int i=0;
+    int i=0, j;
     FILE *archivo;
 
-    archivo = fopen("PRODUCTOS.dat","wb");
+    archivo = fopen("PRODUCTOS.dat","rb");
 
     printf("---LEYENDO ARCHIVO---\n");
     if(archivo==NULL){
@@ -99,6 +105,12 @@ int LeerArchivo(struct PRODUCTO P[]){
     }
     }
     fclose(archivo);
+
+    printf("---CONTENIDO DEL ARCHIVO---\n");
+
+    for(j=0;j<i;j++){
+        printf("CODIGO %d \nPRECIO %.2f \nDESCRIPCION %s \n-------\n",P[j].Codigo, P[j].Precio, P[j].Descripcion);
+    }
     return i;
 }
 
@@ -131,5 +143,5 @@ void ValidarCadena(char Cadena[], int Largo){
             CadenaTemp[strlen(CadenaTemp)-1] = '\0';
         }
     }while(!(strlen(CadenaTemp)<Largo));
-    strcpy(CadenaTemp,Cadena);
+    strcpy(Cadena,Cadena);
 }

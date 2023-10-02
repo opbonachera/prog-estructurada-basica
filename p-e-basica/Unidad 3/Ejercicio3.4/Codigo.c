@@ -1,73 +1,125 @@
 #include <stdio.h>
 #include <string.h>
 
+struct PRODUCTO{
+    int Codigo;
+    float Precio;
+    char Descripcion[50];
+};
+
 void  ValidarCadena(char[],int);
 float ValidarReal(float,float,float);
 int   ValidarEntero(int,int,int);
 int   LeerArchivo(struct PRODUCTO[]);
 int   Busqueda(struct PRODUCTO[], int, int);
-void  GrabarArchivo(struct PRODUCTO[]);
-void  ActualizarDatos(struct PRODUCTO[]);
+int   LeerArchivoActualizado(struct PRODUCTO[]);
+void  GrabarArchivo(struct PRODUCTO[],int);
+void  ActualizarDatos(struct PRODUCTO[],int);
 
 int main(){
+    struct PRODUCTO P[100];
+    int Cantidad;
+
+    Cantidad = LeerArchivo(P);
+    ActualizarDatos(P,Cantidad);
+    GrabarArchivo(P, Cantidad);
+    printf("---ARCHIVO ACTUALIZADO---\n");
+    LeerArchivoActualizado(P);
+
     return 0;
 }
 
 void ActualizarDatos(struct PRODUCTO P[], int Cant){
-    int i=0, pos;
+    int i=0, pos, Incremento;
 
     printf("Ingrese el porcentaje de incremento de precios...\n");
     scanf("%d",&Incremento);
     for(i=0;i<Cant;i++){
-        P[i].Precio = (float) (P[i].Precio) * (Incremento/10);
+        P[i].Precio = (float) ((P[i].Precio) * (Incremento/100.)) + P[i].Precio;
     }
 }
 
 int Busqueda(struct PRODUCTO P[], int Buscado, int Cant){
     int pos=-1, i=0;
 
-    while(i!=-1 && i<Cant){
+    while(pos!=-1 && i<Cant){
         if(P[i].Codigo==Buscado){
-            pos=1;
+            pos=i;
+        }else{
+            pos++;
         }
     }
     return pos;
 }
 
-int Busqueda(struct PRODUCTO P[]){}
-void LeerArchivo(struct PRODUCTO P[]){
-    int i=0;
+int LeerArchivo(struct PRODUCTO P[]){
+    int i=0, j;
     FILE *archivo;
 
-    fopen("alumnos.dat","rb");
-    if(arch==NULL){
+    printf("---LEYENDO ARCHIVO---\n");
+    archivo = fopen("PRECIOS.dat","rb");
+    if(archivo==NULL){
         printf("Error al leer el archivo. \n");
     }else{
-        fread(&P[i],sizeof(PRODUCTO),1,archivo);
+        fread(&P[i],sizeof(struct PRODUCTO),1,archivo);
 
         while(!feof(archivo)){
-            fread(&P[i],sizeof(PRODUCTO),1,archivo);
+            fread(&P[i],sizeof(struct PRODUCTO),1,archivo);
             i++;
         }
     }
 
-    fclose(arch);
+    printf("CONTENIDO DEL ARCHIVO");
+    for(j=0;j<i;j++){
+        printf("CODIGO    %d    PRECIO   %f     DESCRIPCION %s \n", P[j].Codigo, P[j].Precio, P[j].Descripcion);
+    }
 
+    fclose(archivo);
+
+    printf("---FIN DE LECTURA---\n");
     return i;
 }
 
-void GrabarArchivo(struct PRODUCTO A[], int Cant){
+int LeerArchivoActualizado(struct PRODUCTO P[]){
+    int i=0, j;
+    FILE *archivo;
+
+    printf("---LEYENDO ARCHIVO---\n");
+    archivo = fopen("precios_actualizados.dat","rb");
+    if(archivo==NULL){
+        printf("Error al leer el archivo. \n");
+    }else{
+        fread(&P[i],sizeof(struct PRODUCTO),1,archivo);
+
+        while(!feof(archivo)){
+            fread(&P[i],sizeof(struct PRODUCTO),1,archivo);
+            i++;
+        }
+    }
+
+    printf("---CONTENIDO DEL ARCHIVO---\n");
+    for(j=0;j<i;j++){
+        printf("CODIGO    %d    PRECIO   %f     DESCRIPCION %s \n", P[j].Codigo, P[j].Precio, P[j].Descripcion);
+    }
+
+    fclose(archivo);
+
+    printf("---FIN DE LECTURA---\n");
+    return i;
+}
+
+void GrabarArchivo(struct PRODUCTO P[], int Cant){
     int i=0;
     FILE * arch;
 
-    printf("---GRABANDO ARCHIVO...\n");
+    printf("---GRABANDO ARCHIVO---\n");
     arch = fopen("precios_actualizados.dat","wb");
 
     if(arch==NULL){
         printf("Hubo un error.\n");
     }else{
         for(i=0;i<Cant;i++){
-            fwrite(&A[i],sizeof(struct ALUMNO),1,arch);
+            fwrite(&P[i],sizeof(struct PRODUCTO),1,arch);
         }
     }
     fclose(arch);
@@ -105,7 +157,7 @@ void ValidarCadena(char Cadena[], int Largo){
             CadenaTemp[strlen(CadenaTemp)-1] = '\0';
         }
     }while(!(strlen(CadenaTemp)==Largo));
-    strcpy(CadenaTemp,Cadena);
+    strcpy(Cadena,CadenaTemp);
 }
 
 
