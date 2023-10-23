@@ -1,0 +1,17 @@
+Se dispone de un archivo llamado Rating.dat que guarda la información de los puntos obtenidos de rating en
+los distintos programas de canales de cable a lo largo del día. Cada registro contiene:
+    • Número de canal (entero)
+    • Programa (texto de 35 caracteres máximo)
+    • Rating (float)
+El archivo se encuentra ordenado por canal.
+Se solicita informar:
+    a. Aquellos canales que obtengan menos de 15 puntos en total.
+    b. El canal más visto.
+    c. Generar un archivo con el promedio de rating de cada canal que incluya dos campos:
+        • Número de canal.
+        • Promedio.
+
+Analisis de la consigna
+Un nivel de corte de control. Se leen los datos segun el numero de canal.
+Contador para los canales con menos de 5 puntos de rating.
+Generar un archivo a partir de una nueva estructura con numero de canal y promedio de rating.
