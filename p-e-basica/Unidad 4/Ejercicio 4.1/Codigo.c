@@ -1,76 +1,49 @@
 #include <stdio.h>
+#include <string.h>
 
 typedef struct{
-    char  Programa[35];
-    float Rating;
-    int   NumeroCanal;
-}CANAL;
-
-typedef struct{
-    int NumCanal;
-    int Promedio;
-}PROMEDIOCANAL;
-
-void GrabarArchivo(PROMEDIOCANAL[], int);
+    char Zona[20];
+    int CodigoLocalidad;
+    int Dia;
+    int Mes;
+    float MMCaidos;
+}MEDICION;
 
 int main(){
-    FILE *Archivo;
-    int NumeroAnterior, RatingMenor, Mayor=0, i=0;
-    CANAL C;
-    PROMEDIOCANAL VCanal[];
+    FILE* Archivo;
+    int i=0, LocalidadAnterior=0;
+    MEDICION M;
+    char ZonaAnterior[20];
+    float PrecPorZona=0,DiasPorLocalidad=0;
 
-    Archivo = fopen("Rating.dat","rb");
+    Archivo = fopen("mediciones.dat","rb");
+
     if(Archivo==NULL){
-        printf("Hubo un error. \n");
-    }else{
-
-        fread(&C, sizeof(CANAL),1,Archivo);
-
-        while(!feof(Archivo)){
-            RatingMenor = 0;
-            NumeroAnterior = CANAL.NumeroCanal;
-
-            printf("---CANALES CON MENOS PUNTOS DE RATING---\n");
-
-            do{
-
-                if(CANAL.Rating <= 15) RatingMenor++;
-                if(CANAL.Rating > Mayor){
-                    Mayor = CANAL.NumeroCanal;
-                }
- 
-                PROMEDIOCANAL[i].NumCanal = CANAL.NumeroCanal;
-                PROMEDIOCANAL[i].Promedio = CANAL.Rating;
-
-                fread(&C,sizeof(CANAL),1,Archivo);
-                
-                i++;
-            } while(CANAL.NumeroCanal == NumeroAnterior);
-            
-
-            printf("Canal %d\n", CANAL.NumeroCanal);
-        }
-
-        printf("El canal con mayor numero de rating es el %d\n",Mayor);
-        fclose(Archivo);
-    }
-
-    GrabarArchivo(VCanal,i);
-}
-
-void GrabarArchivo(PROMEDIOCANAL VCanal[], int N){
-    int i=0;
-    FILE *Archivo;
-    
-    Archivo = fopen("promedio.dat","wb");
-
-    if(Archivo!=NULL){
-        for(i=0, i<N; i++){
-            fwrite(&VCanal[i], sizeof(CANAL),1,Archivo);
-        }
-    }else{
         printf("Hubo un error al abrir el archivo. \n");
+        exit(1);
     }
+
+    fread(&M,sizeof(MEDICION),1,Archivo);
+
+    while(!feof(Archivo)){
+
+        PrecPorZona=0;
+        strcpy(ZonaAnterior,M.Zona);
+
+        while( !feof(Archivo) && strcmpi(ZonaAnterior,M.Zona)==0 ){
+            LocalidadAnterior = M.CodigoLocalidad;
+            DiasPorLocalidad=0;
+            while(!feof(archivo) && strcmpi(ZonaAnterior,M.Zona)==0 && LocalidadAnterior==M.CodigoLocalidad){
+                    PrecPorZona+=M.MMCaidos;
+                    DiasPorLocalidad++:
+                    fread(&M,sizeof(MEDICION),1,Archivo);
+            }
+            printf("Cantidad de dias en los que llovio en la localidad %d de la zona %s \n", DiasPorLocalidad, ZonaAnterior);
+        }
+        printf("El total de precipitaciones de la zona %s fue de %.2f", ZonaAnterior, PrecPorZona);
+
+    }
+
     fclose(Archivo);
-    printf("---ARCHIVO GRABADO CORRECTAMENTE---\n");
+    return 0;
 }
