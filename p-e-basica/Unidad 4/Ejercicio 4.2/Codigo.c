@@ -27,50 +27,40 @@ struct PEDIDO
 int Busqueda(struct PRODUCTO[], int, int);
 
 int main(){
-    FILE *Archivo;
-    struct PRODUCTO P;
-    struct VENTAS V;
-    int i=0,j, SucAnterior;
-    float VentasPorSuc=0, VentasTotales=0;
 
-    Archivo=fopen("productos.dat","rb");
+    FILE *Archivo;
+    FILE *Archivo2;
+
+    int i=0, Posicion;
+    struct VENTAS V;
+    struct PRODUCTO Productos[200], auxProducto;
+    char sucAnterior[30];
+    float TotalPorSucursal=0, CantTotal=0;
+    Archivo = fopen("productos.dat","rb");
 
     if(Archivo==NULL){
-        printf("Hubo un error.\n");
+        printf("Error al abrir el archivo. \n");
         exit(1);
     }
 
-    fread(&V, sizeof(struct PRODUCTO),1, Archivo);
+    fread(&auxProducto, sizeof(struct PRODUCTO),1,Archivo);
 
     while(!feof(Archivo)){
-        VentasPorSuc = 0;
-        strcpy(SucAnterior, V.Sucursal);
-
-        while(!feof(Archivo) && strcmpi(SucAnterior,V.Sucursal) == 0){
-            Posicion = Busqueda(Productos, V.Codigo);
-
-            VentasPorSuc+=Productos[p].Precio * V.Cantidad;
-            VentasVec[p]+=Productos[p].Precio * V.Cantidad;
-            fread(&P, sizeof(struct PRODUCTO),1, Archivo);
-        }
-
-        VentasTotales+=VentasPorSuc;
+        Productos[i] = auxProducto;
+        i++;
+        fread(&auxProducto,sizeof(struct PRODUCTO),1,Archivo);
     }
 
+    fclose(Archivo);
 
-    return 0;
-}
+    Archivo2 = fopen("ventas.dat","rb");
 
-int Busqueda(struct PRODUCTO[], int CodigoABuscar){
-    int Pos=-1, int i=0;
-
-    while(Pos==-1){
-        if(Producto[i].Codigo==CodigoABuscar){
-            Pos=i;
-        }else{
-            i++;
-        }
+    if(Archivo2 == NULL){
+        printf("Error al abrir el archivo. \n");
+        exit(1);
     }
 
-    return Pos;
+    fread(&V,sizeof(struct VENTAS),1,Archivo2);
+
+    while(feof(Archivo)))
 }
