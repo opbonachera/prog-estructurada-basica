@@ -33,15 +33,20 @@ int main()
 {
     FILE *Archivo;
     FILE *ArchivoCostos;
+    FILE *ArchivoGastos;
+    FILE *ArchivoSector;
     Archivo = fopen("LLAMADAS.dat", "rb");
     char SectorAnterior[15];
+    char SectorMax[15];
+    char NombreSectorArchivo[15];
+    int i=0, ContadorPorTipo[3]={0};
+    int AcumuladorPorSector, Maximo=0;
+    float c[3], GastosPorSector=0.;
     struct LLAMADA L;
     struct LLAMADA Llamadas[20];
-    int i=0;
-    int AcumuladorPorSector, Maximo=0;
-    char SectorMax[15];
-    float c[3], GastosPorSector=0.;
     struct GASTO G;
+    struct LLAMADACOSTO LC;
+
 
     Archivo=fopen("llamadas.dat","rb");
     ArchivoCostos=fopen("costo.dat","rb");
@@ -63,6 +68,7 @@ int main()
         exit(1);
     }
 
+    // Lectura de los costos por llamada
     for(int i=0; i<3;i++){
         fread(&c[i],sizeof(float),1,ArchivoCostos);
     }
@@ -75,12 +81,22 @@ int main()
             strcpy(SectorAnterior,L.Sector);
             AcumuladorPorSector=0;
             G.Total=0;
+            NombreSectorArchivo = strcat(L.Sector,".dat");
+            // Concatenar el nombre del sector con el string ".dat" y abrir el archivo.
+            ArchivoSector = fopen(NombreSectorArchivo,"wb");
+
             while(!feof(Archivo) && strcmpi(SectorAnterior,L.Sector)==0){
 
                 AcumuladorPorSector+=L.Duracion;
+                ContadorPorTipo[L.Tipo-1]++;
                 GastosPorSector+=L.Duracion * c[L.Tipo-1];
 
-                fwrite(GastosPorSector,sizeof(struct GASTO),1,ArchivoGastos);
+                LC.Duracion = L.Duracion;
+                LC.Costo = L.Duracion * c[L.tipo-1];
+                LC.Tipo = L.Tipo;
+
+                fwrite(&LC,sizeof(struct LLAMADACOSTO),1,ArchivoSector);
+                // Escribir estos datos en llamada costo y despues escribir en el archivo con el nombre que se creo arriba
                 fread(&L, sizeof(struct LLAMADA),1,Archivo);
             }
 
@@ -99,15 +115,3 @@ int main()
     return 0;
 }
 
-void LeerGastos()
-{
-    FILE *ArchivoGastos;
-
-    ArchivoGastos = fopen("gastos.dat","rb");
-
-    while(!feof(ArchivoGastos))
-    {
-        printf("SECTOR: %s - GASTO: %f");
-        printf("SECTOR: %s - GASTO: %f");
-    }
-}
