@@ -26,8 +26,10 @@ void LeerCostos(float[]);
 int main(){
     FILE *ArchivoLlamadas;
     FILE *ArchivoGastos;
+    FILE *ArchivoValorizado;
     FILE *Sector;
 
+    char    NombreSector[20];
     char    SecAnterior[20];
     int     TipoAnterior, AcumuladorPorSector, Contador;
     float   CostoPorSector[3] = {0};
@@ -48,19 +50,23 @@ int main(){
         exit(1);
     }
 
+    // Lectura del archivo que contiene las llamadas
     fread(&L, sizeof(struct LLAMADA),1,ArchivoLlamadas);
 
     while(!feof(ArchivoLlamadas)){
+        // Copia del codigo de sector
         strcpy(SecAnterior, L.Sector);
+        strcat(L.Sector,".dat");
         AcumuladorPorSector = 0;
-        // Bucle por sector
+        G.Total=0;
 
+        // Bucle por sector
         while(!feof(ArchivoLlamadas) && strcmpi(SecAnterior,L.Sector)==0){
 
             TipoAnterior = L.Tipo;
             AcumuladorPorSector+= L.Duracion;
             Contador=0;
-            G.Total=0;
+            ArchivoValorizado = fopen(NombreSector, "wb");
             // Bucle por tipo de llamada
             while(!feof(ArchivoLlamadas) && strcmpi(SecAnterior,L.Sector)==0 && TipoAnterior==L.Tipo){
                 Contador++;
@@ -71,7 +77,7 @@ int main(){
 
                 fread(&L, sizeof(struct LLAMADA),1,ArchivoLlamadas);
             }
-            fwrite(LC,sizeof(struct LLAMADACOSTO),1,ArchivoValorizado);
+            fwrite(&LC,sizeof(struct LLAMADACOSTO),1,ArchivoValorizado);
             printf("Se realizaron %d llamadas del tipo %d.\n", Contador, TipoAnterior);
 
             strcpy(G.Sector,SecAnterior);
@@ -79,6 +85,7 @@ int main(){
         }
 
         printf("El sector %s hablo durante %d minutos. \n", SecAnterior, AcumuladorPorSector);
+        fclose(ArchivoValorizado);
         fwrite(&G, sizeof(struct GASTO),1,ArchivoGastos);
         fread(&L, sizeof(struct LLAMADA),1,ArchivoLlamadas);
     }
@@ -108,7 +115,7 @@ void LeerCostos(float Costos[])
 
 void ImprimirGastos(){
     FILE *ArchivoGastos;
-    ArchivoGastos = fopen("gastos.dat","rb");
+    ArchivoGastos = fopen("gasto.dat","rb");
     struct GASTO G;
     if(ArchivoGastos==NULL){
         printf("Error al abrir el archivo. \n");
