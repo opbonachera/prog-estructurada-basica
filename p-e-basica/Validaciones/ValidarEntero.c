@@ -30,4 +30,17 @@ void ValidarCadena(char Cadena[], int Largo){
     strcpy(CadenaTemp,Cadena);
 }
 
+void LeerArchivo(){
+    FILE *Archivo;
 
+    Archivo = fopen("archivo.dat","rb");
+    if(Archivo==NULL){
+        printf("Error al abrir el archivo \n");
+        exit(1);
+    }
+
+    fread(&Temp, sizeof(struct TEMP), 1, Archivo);
+    while(!feof(Archivo)){
+        fread(&Temp, sizeof(struct TEMP), 1, Archivo);
+    }
+}
