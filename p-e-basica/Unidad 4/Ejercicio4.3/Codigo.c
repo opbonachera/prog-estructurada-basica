@@ -44,7 +44,7 @@ int main(){
         printf("Error al abrir el archivo. \n");
     }
 
-    ArchivoGastos = fopen("gastos.dat","wb");
+    ArchivoGastos = fopen("gasto.dat","wb");
     if(ArchivoGastos == NULL){
         printf("Error al abrir el archivo. \n");
         exit(1);
