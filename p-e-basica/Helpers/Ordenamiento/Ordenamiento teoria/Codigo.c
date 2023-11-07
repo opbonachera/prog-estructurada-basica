@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 struct empleado{
     int legajo;
     char nombre[31];
