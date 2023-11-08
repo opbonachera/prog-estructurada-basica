@@ -1,59 +1,66 @@
 #include <stdio.h>
+#include <stdlib.h>
 
-struct EVENTO
-{
+struct EVENTO{
     char Cod[10];
     int  NumPuerta;
     int  CantEsp;
 };
 
-struct PROMEDIOP
-{
+struct EVENTOPROM{
     int   NumPuerta;
-    float Promedio;
+    float Prom;
 };
 
 int main(){
-    FILE *ArchivoEventos;
-    FILE *ArchivoPromedio;
+    FILE *Archivo;
+    FILE *ArchivoProm;
 
-    char   EvAnt[10];
-    int    ContEvento, ContPuerta, ContTotal, EnAnt;
-    struct EVENTO Ev;
-    struct PROMEDIOP PP;
+    struct EVENTO E;
+    struct EVENTOPROM EP;
 
-    ArchivoEventos = fopen("eventos.dat","rb");
-    if(ArchivoEventos == NULL){
+    char  Minimo[30];
+    float Promedio;
+    int   CantPorEvento=0;
+    int   CantPuerta=0;
+
+    char CodAnt[10];
+    int  PuertaAnt;
+
+    Archivo = fopen("eventos.dat","rb");
+    ArchivoProm = fopen("eventopromedio.dat","wb");
+    if(Archivo == NULL || ArchivoProm == NULL){
         printf("Error al abrir el archivo.\n");
         exit(1);
     }
 
-    fread(&Ev, sizeof(struct EVENTO),1,ArchivoEventos);
-    while(!feof(ArchivoEventos)){
-        strcpy(EvAnt, Ev.Cod);
-        ContEvento=0;
-        // Bucle por evento
-        do{
-            EnAnt = Ev.NumPuerta;
-            ContPuerta=0;
-            // Bucle por entrada
-            ArchivoPuerta  = fopen("promediopuerta.dat","wb");
+    fread(&E, sizeof(struct EVENTO), 1, Archivo);
+    while(!feof(Archivo)){
+            strcpy(CodAnt,E.Cod);
+            CantPorEvento=0;
 
-                do{
-                    ContPuerta++;
-                    fread(&Ev, sizeof(struct EVENTO),1,ArchivoEventos);
-                }while(!feof(ArchivoEventos) && EvAnt == Ev.Cod && EnAnt == Ev.NumPuerta);
+            while(strcmpi(CodAnt,E.Cod)==0 && !feof(Archivo)){
+                PuertaAnt = E.NumPuerta;
+                CantPuerta=0;
 
-            ContEvento+=ContPuerta;
-            PP.Puerta=Ev.NumPuerta;
-            PP.Promedio=(float)ContEvento*ContPuerta/100;
+                while(PuertaAnt == E.NumPuerta && strcmpi(CodAnt,E.Cod)==0 && !feof(Archivo)){
 
-            fwrite(&PP,sizeof(struct PROMEDIOP),1,ArchivoPuerta);
-            // Fin bucle por entrada
-            fclose(ArchivoPuerta);
-        }while(!feof(ArchivoEventos) && EvAnt == Ev.Cod);
-        // Fin bucle por evento
+                    CantPuerta+=E.CantEsp;
+                    fread(&E, sizeof(struct EVENTO), 1, Archivo);
+                }
+                CantPorEvento+=CantPuerta;
+
+                EP.NumPuerta = PuertaAnt;
+                EP.Prom = (float)(CantPorEvento)/(CantPuerta);
+
+                fwrite(&EP,sizeof(struct EVENTOPROM),1,ArchivoProm);
+            }
+            printf("Al evento de codigo %s asistieron %d espectadores.\n", CodAnt, CantPorEvento);
     }
-    fclose(ArchivoEventos);
-    // Fin de archivo
+
+    fclose(Archivo);
+    fclose(ArchivoProm);
+
+    return 0;
 }
+

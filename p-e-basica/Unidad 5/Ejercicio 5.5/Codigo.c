@@ -55,10 +55,10 @@ void Listar(){
         exit(1);
     }
 
-    printf("    NOMBRE   NUMERO    \n");
+    printf("    NOMBRE        NUMERO    \n");
     fread(&C, sizeof(struct CONTACTO), 1, Archivo);
     while(!feof(Archivo)){
-        printf("    %s       %d   \n", C.Nombre, C.Numero);
+        printf(" -> %s       \t%d   \n", C.Nombre, C.Numero);
         fread(&C, sizeof(struct CONTACTO), 1, Archivo);
     }
 
@@ -70,7 +70,7 @@ void AgregarContacto(){
 
     FILE *Archivo;
     struct CONTACTO C;
-
+    char Nombre[15];
     Archivo = fopen("agenda.dat","a+b");
     if(Archivo==NULL){
         printf("Error al abrir la agenda. Saliendo...\n");
@@ -79,7 +79,13 @@ void AgregarContacto(){
 
     printf("Ingrese el nombre del nuevo contacto...\n");
     fflush(stdin);
-    fgets(C.Nombre,15,stdin);
+    fgets(Nombre,15,stdin);
+
+    if(Nombre[strlen(Nombre)-1] == '\n'){
+            Nombre[strlen(Nombre)-1] = '\0';
+    }
+
+    strcpy(C.Nombre,Nombre);
 
     printf("Ingrese el numero del contacto...\n");
     scanf("%d",&C.Numero);
@@ -117,7 +123,6 @@ struct CONTACTO Busqueda(){
     while(!feof(Archivo) && Encontrado==0){
 
         if(strcmpi(Nombre, C.Nombre)==0){
-            printf("HOLA\n");
             Encontrado=1;
             CEncontrado = C;
         }else{
@@ -127,21 +132,23 @@ struct CONTACTO Busqueda(){
 
     if(Encontrado==0){
         printf("No se encontro el contacto. \n");
-        C.Numero=-1;
+        CEncontrado.Numero=-1;
     }else{
         printf("NOMBRE: %s    ---- NUMERO: %d   \n", CEncontrado.Nombre, CEncontrado.Numero);
     }
 
     fclose(Archivo);
-    return C;
+    return CEncontrado;
 }
 
 void ModificarContacto(){
     printf("---MODIFICACION---\n");
-    struct CONTACTO C;
-    char  Opcion;
-    FILE *Archivo;
-    char Nombre[15];
+    struct CONTACTO C, CEnc;
+    char   Opcion;
+    char   Nombre[15];
+    int    Ban=0;
+    FILE   *Archivo;
+
 
     Archivo = fopen("agenda.dat","r+b");
     if(Archivo==NULL){
@@ -149,47 +156,103 @@ void ModificarContacto(){
         exit(1);
     }
 
-    printf("Ingrese el nombre del contacto que desea modificar...\n");
-    fgets(Nombre,15,stdin);
+    CEnc = Busqueda();
 
-    if(Nombre[strlen(Nombre)-1] == '\n'){
-            Nombre[strlen(Nombre)-1] = '\0';
-    }
+    if(CEnc.Numero!=-1){
+        printf("Entro al if");
+        fread(&C, sizeof(struct CONTACTO),1,Archivo);
+        Ban=0;
+        while(!feof(Archivo) && Ban==0){
+                printf("Entro al while");
+                if(strcmpi(C.Nombre, CEnc.Nombre) == 0){
+                        Ban=1;
+                        printf("¿Desea modificar el nombre del contacto? S/N\n");
+                        fflush(stdin);
+                        scanf("%c",&Opcion);
 
-    C = Busqueda();
+                        if(toupper(Opcion)=='S'){
+                            printf("Ingrese el nuevo nombre del contacto...\n");
+                            fflush(stdin);
+                            fgets(Nombre,15,stdin);
 
-    if(C.Numero!=-1){
-        printf("¿Desea modificar el nombre del contacto? S/N\n");
-        fflush(stdin);
-        scanf("%c",&Opcion);
+                            if(Nombre[strlen(Nombre)-1] == '\n'){
+                                Nombre[strlen(Nombre)-1] = '\0';
+                            }
 
-        if(Opcion=='S'){
-            printf("Modificando...\n");
-        }else{
-            printf("No modifica\n");
+                            strcpy(CEnc.Nombre,Nombre);
+                        }else{
+                            printf("No modifica\n");
+                        }
+
+                        printf("¿Desea modificar el numero del contacto? S/N\n");
+                        fflush(stdin);
+                        scanf("%c",&Opcion);
+
+                        if(toupper(Opcion)=='S'){
+                            printf("Ingrese el nuevo numero del contacto...\n");
+                            scanf("%d",&CEnc.Numero);
+                        }else{
+                            printf("No modifica...\n");
+                        }
+
+                        fseek(Archivo, sizeof(struct CONTACTO)*-1,SEEK_CUR);
+                        fwrite(&CEnc, sizeof(struct CONTACTO),1,Archivo);
+                        fflush(Archivo);
+                }else{
+                    fread(&C, sizeof(struct CONTACTO),1,Archivo);
+                }
         }
 
-        printf("¿Desea modificar el numero del contacto? S/N\n");
-        fflush(stdin);
-        scanf("%c",&Opcion);
-
-        if(Opcion=='S'){
-            printf("Modificando numero...\n");
-        }else{
-            printf("No modifica...\n");
-        }
     }
 }
 
 void EliminarContacto(){
     printf("---ELIMINAR CONTACTO---\n");
+
+    FILE *Archivo, *Temp;
+    struct CONTACTO C;
+    char Nombre[15];
+
+    Archivo = fopen("agenda.dat","r+b");
+    Temp = fopen("agendatemp.dat","w+b");
+
+    if(Archivo==NULL || Temp==NULL){
+        printf("Error al abrir el archivo. Saliendo...\n");
+        exit(1);
+    }
+
+    printf("Ingrese el nombre del contacto que desea eliminar...\n");
+    fflush(stdin);
+    fgets(Nombre,15,stdin);
+
+    if(Nombre[strlen(Nombre)-1]=='\n'){
+        Nombre[strlen(Nombre)-1] = '\0';
+    }
+
+    fread(&C, sizeof(struct CONTACTO),1,Archivo);
+    while(!feof(Archivo)){
+        printf("Entro al while\n");
+        if(strcmpi(Nombre,C.Nombre)!=0){
+            printf("Entro al if\n");
+            fwrite(&C, sizeof(struct CONTACTO),1,Temp);
+        }
+        fread(&C, sizeof(struct CONTACTO),1,Archivo);
+    }
+
+    printf("Contacto eliminado\n");
+
+    fclose(Archivo);
+    fclose(Temp);
+
+    remove("agenda.dat");
+    rename("agendatemp.dat","agenda.dat");
 }
 
 int Menu()
 {
     int Opcion;
     printf("---AGENDA---\n");
-    printf("ELIJA UNA OPCION \n0.Salir \n1.Mostrar contactos\n2.Agregar contacto\n3.Buscar contactos\n4.Modificar contacto\n5.Borrar contacto...\n");
+    printf("ELIJA UNA OPCION \n0.Salir \n1.Mostrar contactos\n2.Agregar contacto\n3.Buscar contactos\n4.Modificar contacto\n5.Borrar contacto\n");
 
     Opcion = ValidarEntero(1,5,0);
 
