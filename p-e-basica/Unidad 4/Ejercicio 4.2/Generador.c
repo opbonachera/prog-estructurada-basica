@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-struct SUCURSAL
+struct VENTA
 {
     char Suc[15];
     int  Cod;
@@ -17,24 +17,21 @@ struct PRODUCTO{
 };
 
 int main(){
-    int i, CantSuc;
-    int j, CantPed;
-    FILE *ArchivoSuc;
-    FILE *ArchivoP;
+    GenerarArchProd();
+    GenerarArchVen();
 
-    struct PRODUCTO P[] = {
-        {1, "Producto",23.45,23,2,32},
-        {1, "Producto",23.45,23,2,32},
-        {1, "Producto",23.45,23,2,32},
-        {1, "Producto",23.45,23,2,32},
-        {1, "Producto",23.45,23,2,32},
-        {1, "Producto",23.45,23,2,32},
-        {1, "Producto",23.45,23,2,32},
-        {1, "Producto",23.45,23,2,32},
-        {1, "Producto",23.45,23,2,32},
-    };
+    LeerVentas(6);
+    LeerProductos(10);
 
-    struct SUCURSAL S[] = {
+    return 0;
+}
+
+int GenerarArchVen(){
+    int i, CantVentas;
+
+    FILE *ArchVentas;
+
+    struct VENTA V[] = {
         {"SucursalUno",1,100},
         {"SucursalUno",1,100},
         {"SucursalUno",43,100},
@@ -43,38 +40,81 @@ int main(){
         {"SucursalDos",23,100}
     };
 
-    CantPed = sizeof(P) / sizeof(struct PEDIDO);
-    ArchivoP = fopen("pedidos.dat","wb");
-
-    CantSuc = sizeof(S) / sizeof(struct SUCURSAL);
-    ArchivoSuc = fopen("sucursales.dat","wb");
-
-    if(ArchivoP == NULL || ArchivoSuc == NULL){
-        printf("Error al escribir el archivo. \n");
+    ArchVentas = fopen("ventas.dat","wb");
+    if(ArchVentas==NULL){
+        printf("Error.\n");
         exit(1);
     }
 
-    for(j=0;j<CantPed;j++){
-        fwrite(&S[i],sizeof(struct SUCURSAL),1,ArchivoSuc);
+    CantVentas = sizeof(V) / sizeof(struct VENTA);
+
+    for(i=0;i<CantVentas;i++){
+        fwrite(&V[i], sizeof(struct VENTA),1,ArchVentas);
     }
 
-    for(i=0;i<CantSuc;i++){
-        fwrite(&S[i],sizeof(struct SUCURSAL),1,ArchivoSuc);
-    }
-
-    fclose(ArchivoSuc);
-    fclose(ArchivoP);
-
-    LeerArchivo(CantSuc);
+    fclose(ArchVentas);
     return 0;
 }
 
-void LeerArchivo(int Cant){
+int GenerarArchProd(){
+    int j, CantProd;
+
+    FILE *ArchProd;
+
+    struct PRODUCTO P[] = {
+        {1, "Producto",23.45,23,2,32},
+        {2, "Producto",23.45,23,2,32},
+        {3, "Producto",23.45,23,2,32},
+        {4, "Producto",23.45,23,2,32},
+        {5, "Producto",23.45,23,2,32},
+        {6, "Producto",23.45,23,2,32},
+        {7, "Producto",23.45,23,2,32},
+        {8, "Producto",23.45,23,2,32},
+        {9, "Producto",23.45,23,2,32},
+    };
+
+    ArchProd = fopen("productos.dat","wb");
+    if(ArchProd == NULL){
+        printf("Error.\n");
+        exit(1);
+    }
+
+    CantProd = sizeof(P) / sizeof(struct PRODUCTO);
+
+    for(j=0;j<CantProd;j++){
+        fwrite(&P[j], sizeof(struct PRODUCTO),1,ArchProd);
+    }
+
+    fclose(ArchProd);
+}
+
+void LeerProductos(){
     FILE *Archivo;
     int i=0;
-    struct SUCURSAL S[100];
+    struct PRODUCTO P[100];
 
-    Archivo = fopen("sucursales.dat","rb");
+    Archivo = fopen("productos.dat","rb");
+
+    if(Archivo==NULL){
+        printf("Error.\n");
+        exit(1);
+    }
+
+    fread(&P, sizeof(struct PRODUCTO),1,Archivo);
+    while(!feof(Archivo)){
+        printf("%d - %s",P[i].Cod, P[i].Desc);
+        fread(&P, sizeof(struct PRODUCTO),1,Archivo);
+    }
+
+    fclose(Archivo);
+}
+
+void LeerVentas(int Cant){
+    FILE *Archivo;
+    int i=0;
+    struct VENTA V[100];
+
+    Archivo = fopen("ventas.dat","rb");
 
     if(Archivo==NULL){
         printf("Hubo un error al abrir el archivo. \n");
@@ -83,14 +123,14 @@ void LeerArchivo(int Cant){
 
     printf("---CONTENIDO DEL ARCHIVO---\n");
 
-    fread(&S[i],sizeof(struct SUCURSAL),1,Archivo);
+    fread(&V[i],sizeof(struct VENTA),1,Archivo);
     while(!feof(Archivo)){
         i++;
-        fread(&S[i],sizeof(struct SUCURSAL),1,Archivo);
+        fread(&V[i],sizeof(struct VENTA),1,Archivo);
     }
 
     for(i=0;i<Cant;i++){
-         printf("SUCURSAL: %s - CODIGO: %d - CANTIDAD: %d \n", S[i].Suc, S[i].Cod, S[i].Cant);
+         printf("SUCURSAL: %s - CODIGO: %d - CANTIDAD: %d \n", V[i].Suc, V[i].Cod, V[i].Cant);
     }
 
     fclose(Archivo);
