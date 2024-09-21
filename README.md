@@ -1,3 +1,3 @@
 # EstructuradaBasica
 
-Repository for academic purposes :)
+Programación Estructurada Básica UNLaM
